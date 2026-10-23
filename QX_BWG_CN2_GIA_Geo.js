@@ -1,57 +1,34 @@
 
 /*
- * Quantumult X GEO 信息自定义
- * 搬瓦工 CN2 GIA 专用
- * 不显示国旗
+ * Quantumult X GEO 自定义显示 V2
+ * 搬瓦工 CN2 GIA 单节点专用
+ * 无国旗、无城市、固定双行标题
  */
 
-(function () {
-  if (!$response || Number($response.statusCode) !== 200) {
-    $done(null);
-    return;
-  }
+var info = {};
 
-  try {
-    const obj = JSON.parse($response.body);
+try {
+  info = JSON.parse(($response && $response.body) || "{}");
+} catch (e) {
+  info = {};
+}
 
-    if (obj.status === "fail") {
-      $done(null);
-      return;
-    }
+var location = [
+  info.country,
+  info.regionName,
+  info.city
+].filter(Boolean).join(" / ") || "未知";
 
-    const provider = [
-      obj.org,
-      obj.isp,
-      obj.as
-    ].filter(Boolean).join(" ");
+var description = [
+  "服务商: " + (info.org || info.isp || "IT7 Networks Inc."),
+  "地区: " + location,
+  "IP: " + (info.query || "未知"),
+  "时区: " + (info.timezone || "未知")
+].join("\n");
 
-    const isBWG = /IT7\s*Networks/i.test(provider);
-
-    const title = isBWG
-      ? "搬瓦工 · CN2 GIA"
-      : (obj.city || obj.regionName || "未知地区");
-
-    const subtitle = isBWG
-      ? "IT7 Networks Inc."
-      : (obj.org || obj.isp || "未知运营商");
-
-    const ip = obj.query || "";
-
-    const description = [
-      "服务商: " + (obj.isp || obj.org || "未知"),
-      "地区: " + (obj.regionName || "未知"),
-      "IP: " + ip,
-      "时区: " + (obj.timezone || "未知")
-    ].join("\n");
-
-    $done({
-      title,
-      subtitle,
-      ip,
-      description
-    });
-
-  } catch (e) {
-    $done(null);
-  }
-})();
+$done({
+  title: "搬瓦工 · CN2 GIA",
+  subtitle: "IT7 Networks Inc.",
+  ip: info.query || "",
+  description: description
+});
