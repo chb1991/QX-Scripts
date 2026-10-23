@@ -1,34 +1,28 @@
 
-/*
- * Quantumult X GEO 自定义显示 V2
- * 搬瓦工 CN2 GIA 单节点专用
- * 无国旗、无城市、固定双行标题
- */
+/* Quantumult X GEO 自定义显示 - V3 */
 
-var info = {};
+var data = {};
 
 try {
-  info = JSON.parse(($response && $response.body) || "{}");
+  if (typeof $response !== "undefined" && $response.body) {
+    data = JSON.parse($response.body);
+  }
 } catch (e) {
-  info = {};
+  data = {};
 }
 
-var location = [
-  info.country,
-  info.regionName,
-  info.city
-].filter(Boolean).join(" / ") || "未知";
+var ip = data.query || data.ip || "";
+var org = data.org || data.isp || "未知";
+var city = data.city || data.regionName || data.region || "未知";
 
-var description = [
-  "服务商: " + (info.org || info.isp || "IT7 Networks Inc."),
-  "地区: " + location,
-  "IP: " + (info.query || "未知"),
-  "时区: " + (info.timezone || "未知")
-].join("\n");
+var description =
+  "出口 IP: " + (ip || "未知") +
+  "\n实际运营商: " + org +
+  "\n实际地区: " + city;
 
 $done({
   title: "搬瓦工 · CN2 GIA",
   subtitle: "IT7 Networks Inc.",
-  ip: info.query || "",
+  ip: ip,
   description: description
 });
